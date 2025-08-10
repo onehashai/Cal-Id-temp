@@ -64,6 +64,7 @@
   --cal-bg-inverted: hsla(210, 30%, 4%, 1); /* gray.900 - tooltips */
   --cal-bg-gradient: linear-gradient(hsla(213, 100%, 97%, 1), hsla(229, 100%, 97%, 1), hsla(270, 100%, 98%, 1));
   --cal-bg-active: hsla(207, 100%, 45%, 1); /* active tabs */
+  --cal-bg-destrutive: hsla(4, 61%, 49%,1); /* destructive elements */
 
   /* Background Primary */
   --cal-bg-primary: hsla(214, 30%, 16%, 1); /* stone-100 */
@@ -111,7 +112,7 @@
   /* Borders */
   --cal-border-emphasis: hsla(218, 11%, 65%, 1); /* gray.400 - input:hover */
   --cal-border: hsla(216, 12%, 84%, 1); /* gray.300 - inputs */
-  --cal-border-subtle: hsla(220, 13%, 91%, 1); /* gray.200 - container borders */
+  --cal-border-subtle: hsla(220, 13%, 91%, 1); /* gray.200 - borders */
   --cal-border-muted: hsla(220, 14%, 94%, 1); /* gray.100 */
   --cal-border-error: hsla(0, 96%, 89%, 1); /* Keeping existing error border */
   --cal-border-semantic-error: hsla(0, 96%, 89%, 1);
@@ -371,8 +372,8 @@ html.todesktop.dark {
 [multiple]:focus,
 textarea:focus,
 select:focus {
-  --tw-ring-color: var(--brand-color);
-  border-color: var(--brand-color);
+  --tw-ring-color: var(--cal-bg-subtle);
+  border-color: var(--cal-bg-subtle);
 }
 
 @layer components {
@@ -653,5 +654,25 @@ select:focus {
 }
 
 .bg-cal-active {
+  background-color: var(--cal-bg-active);
+}
+
+.bg-cal-destructive {
+  background-color: var(--cal-bg-destrutive);
+}
+
+.text-cal-destructive {
+  color: var(--cal-text-destructive);
+}
+
+.ring {
+  color: var(--cal-bg-active);
+}
+
+.checked\:cal-bg-actie:checked {
+  background-color: var(--cal-bg-active);
+}
+
+.data-\[state\=checked\]\:cal-bg-active[data-state=checked] {
   background-color: var(--cal-bg-active);
 }
