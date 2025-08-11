@@ -9,6 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-cal-active text-white hover:bg-cal-active/90",
+        tab: "bg-cal-active-dim text-cal-active hover:bg-cal-active/90 border border-active",
         destructive: "bg-cal-destructive text-white text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",

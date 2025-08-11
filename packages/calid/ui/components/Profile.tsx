@@ -13,7 +13,7 @@ import { Icon } from "@calcom/ui/components/icon";
 
 // adjust path based on your structure
 
-export const Profile = () => {
+const Profile = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showHelpOptions, setShowHelpOptions] = useState(false);
 
@@ -101,3 +101,5 @@ export const Profile = () => {
     </DropdownMenu>
   );
 };
+
+export {Profile}
