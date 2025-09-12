@@ -116,61 +116,62 @@ export async function migrateOutOfOffice(ctx: MigrationContext) {
 }
 
 export async function migrateFilterSegments(ctx: MigrationContext) {
-  ctx.log("Migrating Filter Segments...");
+  ctx.log("filterSegment does not exist in old database...skipping migration.");
+  return;
 
-  const oldSegments = await ctx.oldDb.filterSegment.findMany();
+  // const oldSegments = await ctx.oldDb.filterSegment.findMany();
 
-  await ctx.processBatch(oldSegments, async (batch) => {
-    const newSegments = await Promise.all(
-      batch.map(async (oldSegment: any) => {
-        try {
-          const userId = ctx.idMappings.users[oldSegment.userId.toString()];
-          const calIdTeamId = oldSegment.teamId
-            ? ctx.idMappings.calIdTeams[oldSegment.teamId.toString()]
-            : null;
+  // await ctx.processBatch(oldSegments, async (batch) => {
+  //   const newSegments = await Promise.all(
+  //     batch.map(async (oldSegment: any) => {
+  //       try {
+  //         const userId = ctx.idMappings.users[oldSegment.userId.toString()];
+  //         const calIdTeamId = oldSegment.teamId
+  //           ? ctx.idMappings.calIdTeams[oldSegment.teamId.toString()]
+  //           : null;
 
-          if (!userId) {
-            ctx.log(`Skipping filter segment ${oldSegment.id} - user not found`);
-            return null;
-          }
+  //         if (!userId) {
+  //           ctx.log(`Skipping filter segment ${oldSegment.id} - user not found`);
+  //           return null;
+  //         }
 
-          // Map TEAM scope to CALIDTEAM if applicable
-          let scope = oldSegment.scope;
-          if (scope === "TEAM" && calIdTeamId) {
-            scope = "CALIDTEAM";
-          }
+  //         // Map TEAM scope to CALIDTEAM if applicable
+  //         let scope = oldSegment.scope;
+  //         if (scope === "TEAM" && calIdTeamId) {
+  //           scope = "CALIDTEAM";
+  //         }
 
-          const newSegment = await ctx.newDb.filterSegment.create({
-            data: {
-              name: oldSegment.name,
-              tableIdentifier: oldSegment.tableIdentifier,
-              scope: scope,
-              activeFilters: oldSegment.activeFilters,
-              sorting: oldSegment.sorting,
-              columnVisibility: oldSegment.columnVisibility,
-              columnSizing: oldSegment.columnSizing,
-              perPage: oldSegment.perPage,
-              searchTerm: oldSegment.searchTerm,
-              createdAt: oldSegment.createdAt,
-              updatedAt: oldSegment.updatedAt,
-              userId: userId,
-              teamId: oldSegment.teamId,
-              calIdTeamId: calIdTeamId,
-            },
-          });
+  //         const newSegment = await ctx.newDb.filterSegment.create({
+  //           data: {
+  //             name: oldSegment.name,
+  //             tableIdentifier: oldSegment.tableIdentifier,
+  //             scope: scope,
+  //             activeFilters: oldSegment.activeFilters,
+  //             sorting: oldSegment.sorting,
+  //             columnVisibility: oldSegment.columnVisibility,
+  //             columnSizing: oldSegment.columnSizing,
+  //             perPage: oldSegment.perPage,
+  //             searchTerm: oldSegment.searchTerm,
+  //             createdAt: oldSegment.createdAt,
+  //             updatedAt: oldSegment.updatedAt,
+  //             userId: userId,
+  //             teamId: oldSegment.teamId,
+  //             calIdTeamId: calIdTeamId,
+  //           },
+  //         });
 
-          ctx.idMappings.filterSegments[oldSegment.id.toString()] = newSegment.id;
-          return newSegment;
-        } catch (error) {
-          ctx.logError(`Failed to migrate filter segment ${oldSegment.id}`, error);
-          return null;
-        }
-      })
-    );
-    return newSegments.filter(Boolean);
-  });
+  //         ctx.idMappings.filterSegments[oldSegment.id.toString()] = newSegment.id;
+  //         return newSegment;
+  //       } catch (error) {
+  //         ctx.logError(`Failed to migrate filter segment ${oldSegment.id}`, error);
+  //         return null;
+  //       }
+  //     })
+  //   );
+  //   return newSegments.filter(Boolean);
+  // });
 
-  ctx.log(`Migrated ${oldSegments.length} filter segments`);
+  // ctx.log(`Migrated ${oldSegments.length} filter segments`);
 }
 
 export async function migrateSelectedSlots(ctx: MigrationContext) {
@@ -218,7 +219,7 @@ export async function migrateOtherTables(ctx: MigrationContext) {
         logo: oldDeployment.logo,
         theme: oldDeployment.theme,
         licenseKey: oldDeployment.licenseKey,
-        signatureTokenEncrypted: oldDeployment.signatureTokenEncrypted,
+        // signatureTokenEncrypted: oldDeployment.signatureTokenEncrypted,
         agreedLicenseAt: oldDeployment.agreedLicenseAt,
       },
     });

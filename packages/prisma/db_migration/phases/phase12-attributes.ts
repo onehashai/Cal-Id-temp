@@ -89,42 +89,43 @@ export async function migrateAttributeOptions(ctx: MigrationContext) {
 }
 
 export async function migrateRoles(ctx: MigrationContext) {
-  ctx.log("Migrating Roles...");
+  ctx.log("Roles does not exist in the old database, skipping migration of roles.");
+  return;
 
-  const oldRoles = await ctx.oldDb.role.findMany();
+  // const oldRoles = await ctx.oldDb.role.findMany();
 
-  await ctx.processBatch(oldRoles, async (batch) => {
-    const newRoles = await Promise.all(
-      batch.map(async (oldRole: any) => {
-        try {
-          const calIdTeamId = oldRole.teamId ? ctx.idMappings.calIdTeams[oldRole.teamId.toString()] : null;
+  // await ctx.processBatch(oldRoles, async (batch) => {
+  //   const newRoles = await Promise.all(
+  //     batch.map(async (oldRole: any) => {
+  //       try {
+  //         const calIdTeamId = oldRole.teamId ? ctx.idMappings.calIdTeams[oldRole.teamId.toString()] : null;
 
-          const newRole = await ctx.newDb.role.create({
-            data: {
-              id: oldRole.id,
-              name: oldRole.name,
-              color: oldRole.color,
-              description: oldRole.description,
-              teamId: oldRole.teamId,
-              calIdTeamId: calIdTeamId,
-              createdAt: oldRole.createdAt,
-              updatedAt: oldRole.updatedAt,
-              type: oldRole.type,
-            },
-          });
+  //         const newRole = await ctx.newDb.role.create({
+  //           data: {
+  //             id: oldRole.id,
+  //             name: oldRole.name,
+  //             color: oldRole.color,
+  //             description: oldRole.description,
+  //             teamId: oldRole.teamId,
+  //             calIdTeamId: calIdTeamId,
+  //             createdAt: oldRole.createdAt,
+  //             updatedAt: oldRole.updatedAt,
+  //             type: oldRole.type,
+  //           },
+  //         });
 
-          ctx.idMappings.roles[oldRole.id] = newRole.id;
-          return newRole;
-        } catch (error) {
-          ctx.logError(`Failed to migrate role ${oldRole.id}`, error);
-          return null;
-        }
-      })
-    );
-    return newRoles.filter(Boolean);
-  });
+  //         ctx.idMappings.roles[oldRole.id] = newRole.id;
+  //         return newRole;
+  //       } catch (error) {
+  //         ctx.logError(`Failed to migrate role ${oldRole.id}`, error);
+  //         return null;
+  //       }
+  //     })
+  //   );
+  //   return newRoles.filter(Boolean);
+  // });
 
-  ctx.log(`Migrated ${oldRoles.length} roles`);
+  // ctx.log(`Migrated ${oldRoles.length} roles`);
 }
 
 export async function runPhase12(ctx: MigrationContext) {

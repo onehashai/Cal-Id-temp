@@ -1,3 +1,5 @@
+import { CreationSource, IdentityProvider } from "@prisma/client";
+
 import type { MigrationContext } from "../types";
 
 export async function migrateApps(ctx: MigrationContext) {
@@ -82,6 +84,11 @@ export async function migrateUsers(ctx: MigrationContext) {
     const newUsers = await Promise.all(
       batch.map(async (oldUser: any) => {
         try {
+          if (oldUser.organizationId) {
+            //skip migrating users belonging to organizations for now
+            ctx.log(`Skipping user ${oldUser.id} - belongs to organization ${oldUser.organizationId}`);
+            return null;
+          }
           const newUser = await ctx.newDb.user.create({
             data: {
               username: oldUser.username,
@@ -107,7 +114,8 @@ export async function migrateUsers(ctx: MigrationContext) {
               twoFactorSecret: oldUser.twoFactorSecret,
               twoFactorEnabled: oldUser.twoFactorEnabled,
               backupCodes: oldUser.backupCodes,
-              identityProvider: oldUser.identityProvider,
+              identityProvider:
+                oldUser.identityProvider === "KEYCLOAK" ? IdentityProvider.CAL : oldUser.identityProvider,
               identityProviderId: oldUser.identityProviderId,
               invitedTo: oldUser.invitedTo,
               brandColor: oldUser.brandColor,
@@ -126,7 +134,7 @@ export async function migrateUsers(ctx: MigrationContext) {
               smsLockState: oldUser.smsLockState,
               smsLockReviewedByAdmin: oldUser.smsLockReviewedByAdmin,
               referralLinkId: oldUser.referralLinkId,
-              creationSource: oldUser.creationSource,
+              creationSource: CreationSource.WEBAPP,
               whitelistWorkflows: oldUser.whitelistWorkflows || false,
             },
           });
@@ -175,7 +183,17 @@ export async function migrateUsers(ctx: MigrationContext) {
 
 export async function runPhase1(ctx: MigrationContext) {
   ctx.log("=== PHASE 1: Core Entities ===");
-  await migrateApps(ctx);
-  await migrateFeatures(ctx);
-  await migrateUsers(ctx);
+
+  const steps = [migrateApps, migrateFeatures, migrateUsers];
+
+  for (const step of steps) {
+    try {
+      await step(ctx);
+    } catch (err) {
+      ctx.log(`❌ Error in ${step.name}:`, err);
+      // optionally: ctx.errors.push({ phase: 1, step: step.name, error: err });
+    }
+  }
+
+  ctx.log("=== PHASE 1 Completed (with possible errors) ===");
 }

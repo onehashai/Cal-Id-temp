@@ -106,29 +106,6 @@ export async function updateScheduleRelations(ctx: MigrationContext) {
     }
   }
 
-  // Update event types with restrictionScheduleId
-  const eventTypesWithRestrictionSchedule = await ctx.oldDb.eventType.findMany({
-    where: { restrictionScheduleId: { not: null } },
-  });
-
-  for (const oldEventType of eventTypesWithRestrictionSchedule) {
-    const eventTypeId = ctx.idMappings.eventTypes[oldEventType.id.toString()];
-    const restrictionScheduleId = oldEventType.restrictionScheduleId
-      ? ctx.idMappings.schedules[oldEventType.restrictionScheduleId.toString()]
-      : null;
-
-    if (eventTypeId && restrictionScheduleId) {
-      try {
-        await ctx.newDb.eventType.update({
-          where: { id: eventTypeId },
-          data: { restrictionScheduleId: restrictionScheduleId },
-        });
-      } catch (error) {
-        ctx.logError(`Failed to update event type ${eventTypeId} restrictionScheduleId`, error);
-      }
-    }
-  }
-
   ctx.log("Updated schedule relations");
 }
 

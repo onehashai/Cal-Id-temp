@@ -36,49 +36,50 @@ export async function migrateWorkspacePlatforms(ctx: MigrationContext) {
 }
 
 export async function migrateDelegationCredentials(ctx: MigrationContext) {
-  ctx.log("Migrating Delegation Credentials...");
+  ctx.log("delegationCredential does not exists on old schema,so skipping...");
+  return;
 
-  const oldCredentials = await ctx.oldDb.delegationCredential.findMany();
+  // const oldCredentials = await ctx.oldDb.delegationCredential.findMany();
 
-  await ctx.processBatch(oldCredentials, async (batch) => {
-    const newCredentials = await Promise.all(
-      batch.map(async (oldCred: any) => {
-        try {
-          const workspacePlatformId =
-            ctx.idMappings.workspacePlatforms[oldCred.workspacePlatformId.toString()];
+  // await ctx.processBatch(oldCredentials, async (batch) => {
+  //   const newCredentials = await Promise.all(
+  //     batch.map(async (oldCred: any) => {
+  //       try {
+  //         const workspacePlatformId =
+  //           ctx.idMappings.workspacePlatforms[oldCred.workspacePlatformId.toString()];
 
-          if (!workspacePlatformId) {
-            ctx.log(`Skipping delegation credential ${oldCred.id} - workspace platform not found`);
-            return null;
-          }
+  //         if (!workspacePlatformId) {
+  //           ctx.log(`Skipping delegation credential ${oldCred.id} - workspace platform not found`);
+  //           return null;
+  //         }
 
-          const newCred = await ctx.newDb.delegationCredential.create({
-            data: {
-              id: oldCred.id,
-              workspacePlatformId: workspacePlatformId,
-              serviceAccountKey: oldCred.serviceAccountKey,
-              enabled: oldCred.enabled,
-              lastEnabledAt: oldCred.lastEnabledAt,
-              lastDisabledAt: oldCred.lastDisabledAt,
-              organizationId: oldCred.organizationId,
-              domain: oldCred.domain,
-              createdAt: oldCred.createdAt,
-              updatedAt: oldCred.updatedAt,
-            },
-          });
+  //         const newCred = await ctx.newDb.delegationCredential.create({
+  //           data: {
+  //             id: oldCred.id,
+  //             workspacePlatformId: workspacePlatformId,
+  //             serviceAccountKey: oldCred.serviceAccountKey,
+  //             enabled: oldCred.enabled,
+  //             lastEnabledAt: oldCred.lastEnabledAt,
+  //             lastDisabledAt: oldCred.lastDisabledAt,
+  //             organizationId: oldCred.organizationId,
+  //             domain: oldCred.domain,
+  //             createdAt: oldCred.createdAt,
+  //             updatedAt: oldCred.updatedAt,
+  //           },
+  //         });
 
-          ctx.idMappings.delegationCredentials[oldCred.id] = newCred.id;
-          return newCred;
-        } catch (error) {
-          ctx.logError(`Failed to migrate delegation credential ${oldCred.id}`, error);
-          return null;
-        }
-      })
-    );
-    return newCredentials.filter(Boolean);
-  });
+  //         ctx.idMappings.delegationCredentials[oldCred.id] = newCred.id;
+  //         return newCred;
+  //       } catch (error) {
+  //         ctx.logError(`Failed to migrate delegation credential ${oldCred.id}`, error);
+  //         return null;
+  //       }
+  //     })
+  //   );
+  //   return newCredentials.filter(Boolean);
+  // });
 
-  ctx.log(`Migrated ${oldCredentials.length} delegation credentials`);
+  // ctx.log(`Migrated ${oldCredentials.length} delegation credentials`);
 }
 
 export async function migrateCredentials(ctx: MigrationContext) {
@@ -215,7 +216,7 @@ export async function migrateDestinationCalendars(ctx: MigrationContext) {
               domainWideDelegationCredentialId: oldCalendar.domainWideDelegationCredentialId,
             },
           });
-
+          ctx.idMappings.destinationCalendar[oldCalendar.id.toString()] = newCalendar.id;
           return newCalendar;
         } catch (error) {
           ctx.logError(`Failed to migrate destination calendar ${oldCalendar.id}`, error);
@@ -231,9 +232,23 @@ export async function migrateDestinationCalendars(ctx: MigrationContext) {
 
 export async function runPhase6(ctx: MigrationContext) {
   ctx.log("=== PHASE 6: Credentials & Calendars ===");
-  await migrateWorkspacePlatforms(ctx);
-  await migrateDelegationCredentials(ctx);
-  await migrateCredentials(ctx);
-  await migrateSelectedCalendars(ctx);
-  await migrateDestinationCalendars(ctx);
+
+  const steps = [
+    migrateWorkspacePlatforms,
+    migrateDelegationCredentials,
+    migrateCredentials,
+    migrateSelectedCalendars,
+    migrateDestinationCalendars,
+  ];
+
+  for (const step of steps) {
+    try {
+      await step(ctx);
+    } catch (err) {
+      ctx.log(`❌ Error in ${step.name}:`, err);
+      // optionally: ctx.errors.push({ phase: 6, step: step.name, error: err });
+    }
+  }
+
+  ctx.log("=== PHASE 6 Completed (with possible errors) ===");
 }

@@ -17,7 +17,6 @@ export async function migrateVerifiedNumbers(ctx: MigrationContext) {
           const newNumber = await ctx.newDb.verifiedNumber.create({
             data: {
               userId: userId,
-              teamId: oldNumber.teamId,
               calIdTeamId: calIdTeamId,
               phoneNumber: oldNumber.phoneNumber,
             },
@@ -52,7 +51,6 @@ export async function migrateVerifiedEmails(ctx: MigrationContext) {
           const newEmail = await ctx.newDb.verifiedEmail.create({
             data: {
               userId: userId,
-              teamId: oldEmail.teamId,
               calIdTeamId: calIdTeamId,
               email: oldEmail.email,
             },
@@ -94,7 +92,6 @@ export async function migrateVerificationTokens(ctx: MigrationContext) {
               expiresInDays: oldToken.expiresInDays,
               createdAt: oldToken.createdAt,
               updatedAt: oldToken.updatedAt,
-              teamId: oldToken.teamId,
               calIdTeamId: calIdTeamId,
               secondaryEmailId: secondaryEmailId,
             },

@@ -63,7 +63,7 @@ export async function migrateWebhookScheduledTriggers(ctx: MigrationContext) {
     const newTriggers = await Promise.all(
       batch.map(async (oldTrigger: any) => {
         try {
-          const webhookId = oldTrigger.webhookId ? ctx.idMappings.webhooks[oldTrigger.webhookId] : null;
+          const webhookId = oldTrigger.webhookId ? ctx.idMappings.webhooks[oldTrigger.webhookId] : undefined;
 
           const newTrigger = await ctx.newDb.webhookScheduledTriggers.create({
             data: {

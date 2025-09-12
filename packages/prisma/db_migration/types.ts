@@ -1,5 +1,13 @@
+import type { PrismaClient } from "@prisma/client";
+
+import type { PrismaClient as OldPrismaClient } from "../generated/old";
+
 export interface IdMapping {
   [oldId: string]: number;
+}
+
+export interface IdMappingString {
+  [oldId: string]: string;
 }
 
 export interface IdMappings {
@@ -21,15 +29,15 @@ export interface IdMappings {
   availabilities: IdMapping;
   apps: IdMapping;
   features: IdMapping;
-  roles: IdMapping;
-  apiKeys: IdMapping;
-  attributes: IdMapping;
-  attributeOptions: IdMapping;
+  roles: IdMappingString;
+  apiKeys: IdMappingString;
+  attributes: IdMappingString;
+  attributeOptions: IdMappingString;
   secondaryEmails: IdMapping;
   accounts: IdMapping;
   sessions: IdMapping;
-  webhooks: IdMapping;
-  routingForms: IdMapping;
+  webhooks: IdMappingString;
+  routingForms: IdMappingString;
   workspacePlatforms: IdMapping;
   delegationCredentials: IdMapping;
   oauthClients: IdMapping;
@@ -42,11 +50,13 @@ export interface IdMappings {
   outOfOfficeEntries: IdMapping;
   internalNotePresets: IdMapping;
   filterSegments: IdMapping;
+  destinationCalendar: IdMapping;
+  bookings: IdMapping;
 }
 
 export interface MigrationContext {
-  oldDb: any; // Replace with actual PrismaClient type
-  newDb: any; // Replace with actual PrismaClient type
+  oldDb: OldPrismaClient; // Replace with actual PrismaClient type
+  newDb: PrismaClient; // Replace with actual PrismaClient type
   idMappings: IdMappings;
   log: (message: string, data?: any) => void;
   logError: (message: string, error: any) => void;

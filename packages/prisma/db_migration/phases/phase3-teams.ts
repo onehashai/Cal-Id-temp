@@ -51,45 +51,45 @@ export async function migrateCalIdTeams(ctx: MigrationContext) {
   ctx.log(`Migrated ${oldTeams.length} teams to CalIdTeams`);
 }
 
-export async function migrateOrganizationSettings(ctx: MigrationContext) {
-  ctx.log("Migrating Organization Settings...");
+// export async function migrateOrganizationSettings(ctx: MigrationContext) {
+//   ctx.log("Migrating Organization Settings...");
 
-  const oldOrgSettings = await ctx.oldDb.organizationSettings.findMany();
+//   const oldOrgSettings = await ctx.oldDb.organizationSettings.findMany();
 
-  await ctx.processBatch(oldOrgSettings, async (batch) => {
-    const newOrgSettings = await Promise.all(
-      batch.map(async (oldSetting: any) => {
-        try {
-          const newSetting = await ctx.newDb.organizationSettings.create({
-            data: {
-              organizationId: oldSetting.organizationId,
-              isOrganizationConfigured: oldSetting.isOrganizationConfigured,
-              isOrganizationVerified: oldSetting.isOrganizationVerified,
-              orgAutoAcceptEmail: oldSetting.orgAutoAcceptEmail,
-              lockEventTypeCreationForUsers: oldSetting.lockEventTypeCreationForUsers,
-              adminGetsNoSlotsNotification: oldSetting.adminGetsNoSlotsNotification,
-              isAdminReviewed: oldSetting.isAdminReviewed,
-              isAdminAPIEnabled: oldSetting.isAdminAPIEnabled,
-              allowSEOIndexing: oldSetting.allowSEOIndexing,
-              orgProfileRedirectsToVerifiedDomain: oldSetting.orgProfileRedirectsToVerifiedDomain,
-              disablePhoneOnlySMSNotifications: oldSetting.disablePhoneOnlySMSNotifications,
-            },
-          });
-          return newSetting;
-        } catch (error) {
-          ctx.logError(`Failed to migrate organization settings ${oldSetting.id}`, error);
-          return null;
-        }
-      })
-    );
-    return newOrgSettings.filter(Boolean);
-  });
+//   await ctx.processBatch(oldOrgSettings, async (batch) => {
+//     const newOrgSettings = await Promise.all(
+//       batch.map(async (oldSetting: any) => {
+//         try {
+//           const newSetting = await ctx.newDb.organizationSettings.create({
+//             data: {
+//               organizationId: oldSetting.organizationId,
+//               isOrganizationConfigured: oldSetting.isOrganizationConfigured,
+//               isOrganizationVerified: oldSetting.isOrganizationVerified,
+//               orgAutoAcceptEmail: oldSetting.orgAutoAcceptEmail,
+//               lockEventTypeCreationForUsers: oldSetting.lockEventTypeCreationForUsers,
+//               adminGetsNoSlotsNotification: oldSetting.adminGetsNoSlotsNotification,
+//               isAdminReviewed: oldSetting.isAdminReviewed,
+//               isAdminAPIEnabled: oldSetting.isAdminAPIEnabled,
+//               allowSEOIndexing: oldSetting.allowSEOIndexing,
+//               orgProfileRedirectsToVerifiedDomain: oldSetting.orgProfileRedirectsToVerifiedDomain,
+//               disablePhoneOnlySMSNotifications: oldSetting.disablePhoneOnlySMSNotifications,
+//             },
+//           });
+//           return newSetting;
+//         } catch (error) {
+//           ctx.logError(`Failed to migrate organization settings ${oldSetting.id}`, error);
+//           return null;
+//         }
+//       })
+//     );
+//     return newOrgSettings.filter(Boolean);
+//   });
 
-  ctx.log(`Migrated ${oldOrgSettings.length} organization settings`);
-}
+//   ctx.log(`Migrated ${oldOrgSettings.length} organization settings`);
+// }
 
 export async function runPhase3(ctx: MigrationContext) {
   ctx.log("=== PHASE 3: Organizations/Teams ===");
   await migrateCalIdTeams(ctx);
-  await migrateOrganizationSettings(ctx);
+  // await migrateOrganizationSettings(ctx);
 }

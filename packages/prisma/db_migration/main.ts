@@ -1,6 +1,6 @@
 import { PrismaClient as NewPrismaClient } from "@prisma/client";
-import { PrismaClient as OldPrismaClient } from "@prisma/client";
 
+import { PrismaClient as OldPrismaClient } from "../../prisma/generated/old";
 import { runPhase1 } from "./phases/phase1-core";
 import { runPhase2 } from "./phases/phase2-auth";
 import { runPhase3 } from "./phases/phase3-teams";
@@ -18,6 +18,7 @@ import { runPhase14 } from "./phases/phase14-features";
 import { runPhase15 } from "./phases/phase15-verification";
 import { runPhase16 } from "./phases/phase16-other";
 import { runPhase17 } from "./phases/phase17-relations";
+import { rollbackMigration } from "./rollback";
 import { createIdMappings, createMigrationContext, log, logError } from "./utils";
 
 // Import other phases as you implement them...
@@ -49,6 +50,8 @@ async function runMigration() {
     await oldDb.$connect();
     await newDb.$connect();
     log("Connected to both databases");
+
+    await rollbackMigration(ctx);
 
     // Run all phases in order
     await runPhase1(ctx); // Core entities

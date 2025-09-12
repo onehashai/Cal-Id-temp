@@ -16,6 +16,9 @@ export async function migrateBookings(ctx: MigrationContext) {
           const reassignById = oldBooking.reassignById
             ? ctx.idMappings.users[oldBooking.reassignById.toString()]
             : null;
+          const destinationCalendarId = oldBooking.destinationCalendarId
+            ? ctx.idMappings.destinationCalendar[oldBooking.destinationCalendarId.toString()]
+            : null;
 
           const newBooking = await ctx.newDb.booking.create({
             data: {
@@ -35,7 +38,7 @@ export async function migrateBookings(ctx: MigrationContext) {
               updatedAt: oldBooking.updatedAt,
               status: oldBooking.status,
               paid: oldBooking.paid,
-              destinationCalendarId: oldBooking.destinationCalendarId,
+              destinationCalendarId: destinationCalendarId,
               cancellationReason: oldBooking.cancellationReason,
               rejectionReason: oldBooking.rejectionReason,
               reassignReason: oldBooking.reassignReason,
@@ -61,6 +64,7 @@ export async function migrateBookings(ctx: MigrationContext) {
             },
           });
 
+          ctx.idMappings.bookings[oldBooking.id.toString()] = newBooking.id;
           return newBooking;
         } catch (error) {
           ctx.logError(`Failed to migrate booking ${oldBooking.id}`, error);
@@ -83,6 +87,10 @@ export async function migrateAttendees(ctx: MigrationContext) {
     const newAttendees = await Promise.all(
       batch.map(async (oldAttendee: any) => {
         try {
+          const bookingId = oldAttendee.bookingId
+            ? ctx.idMappings.bookings[oldAttendee.bookingId.toString()]
+            : null;
+
           const newAttendee = await ctx.newDb.attendee.create({
             data: {
               email: oldAttendee.email,
@@ -90,7 +98,7 @@ export async function migrateAttendees(ctx: MigrationContext) {
               timeZone: oldAttendee.timeZone,
               phoneNumber: oldAttendee.phoneNumber,
               locale: oldAttendee.locale,
-              bookingId: oldAttendee.bookingId,
+              bookingId: bookingId,
               noShow: oldAttendee.noShow,
             },
           });
@@ -121,6 +129,8 @@ export async function migrateBookingReferences(ctx: MigrationContext) {
             ? ctx.idMappings.credentials[oldRef.credentialId.toString()]
             : null;
 
+          const bookingId = ctx.idMappings.bookings[oldRef.bookingId.toString()];
+
           const newRef = await ctx.newDb.bookingReference.create({
             data: {
               type: oldRef.type,
@@ -129,7 +139,7 @@ export async function migrateBookingReferences(ctx: MigrationContext) {
               thirdPartyRecurringEventId: oldRef.thirdPartyRecurringEventId,
               meetingPassword: oldRef.meetingPassword,
               meetingUrl: oldRef.meetingUrl,
-              bookingId: oldRef.bookingId,
+              bookingId: bookingId,
               externalCalendarId: oldRef.externalCalendarId,
               deleted: oldRef.deleted,
               credentialId: credentialId,
@@ -160,11 +170,15 @@ export async function migratePayments(ctx: MigrationContext) {
     const newPayments = await Promise.all(
       batch.map(async (oldPayment: any) => {
         try {
+          const bookingId = oldPayment.bookingId
+            ? ctx.idMappings.bookings[oldPayment.bookingId.toString()]
+            : undefined;
+
           const newPayment = await ctx.newDb.payment.create({
             data: {
               uid: oldPayment.uid,
               appId: oldPayment.appId,
-              bookingId: oldPayment.bookingId,
+              bookingId: bookingId,
               amount: oldPayment.amount,
               fee: oldPayment.fee,
               currency: oldPayment.currency,

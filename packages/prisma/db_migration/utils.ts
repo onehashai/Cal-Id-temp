@@ -1,6 +1,6 @@
 import type { PrismaClient as NewPrismaClient } from "@prisma/client";
-import type { PrismaClient as OldPrismaClient } from "@prisma/client";
 
+import type { PrismaClient as OldPrismaClient } from "../../prisma/generated/old";
 import type { IdMappings, MigrationContext } from "./types";
 
 // Initialize ID mappings
@@ -40,6 +40,8 @@ export function createIdMappings(): IdMappings {
     outOfOfficeEntries: {},
     internalNotePresets: {},
     filterSegments: {},
+    destinationCalendar: {},
+    bookings: {},
   };
 }
 
