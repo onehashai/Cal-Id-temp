@@ -1,3 +1,7 @@
+import { Icon } from "@calid/features/ui/components/icon";
+
+
+
 import type { TFunction } from "i18next";
 import { useEffect, useRef } from "react";
 
@@ -8,7 +12,6 @@ import { useBookerStore } from "@calcom/features/bookings/Booker/store";
 import type { BookerEvent } from "@calcom/features/bookings/types";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import classNames from "@calcom/ui/classNames";
-import { Icon } from "@calcom/ui/components/icon";
 
 /** Render X mins as X hours or X hours Y mins instead of in minutes once >= 60 minutes */
 export const getDurationFormatted = (mins: number | undefined, t: TFunction) => {
@@ -95,7 +98,7 @@ export const EventDuration = ({
   const durations = event?.metadata?.multipleDuration || [15, 30, 60, 90];
 
   return selectedDuration ? (
-    <div className="border-default relative mr-5 flex flex-row items-center justify-between rounded-md border">
+    <div className="relative mr-5 flex flex-row items-center justify-between rounded-md">
       {leftVisible && (
         <button onClick={handleLeft} className="absolute bottom-0 left-0 flex">
           <div className="bg-default flex h-9 w-5 items-center justify-end rounded-md">
@@ -118,8 +121,8 @@ export const EventDuration = ({
               onClick={() => setSelectedDuration(duration)}
               ref={(el) => (itemRefs.current[duration] = el)}
               className={classNames(
-                selectedDuration === duration ? "bg-emphasis" : "hover:text-emphasis",
-                "text-default cursor-pointer rounded-[4px] px-3 py-1.5 text-sm leading-tight transition"
+                selectedDuration === duration ? "bg-cal-active text-white" : "text-default border border-subtle hover:text-emphasis",
+                "cursor-pointer rounded-2xl px-2 mr-2 py-1 text-xs leading-tight transition"
               )}>
               <div className="w-max">{getDurationFormatted(duration, t)}</div>
             </li>

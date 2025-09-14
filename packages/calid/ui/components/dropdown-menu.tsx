@@ -1,10 +1,9 @@
 import { cn } from "@calid/features/lib/cn";
+import { Icon } from "@calid/features/ui/components/icon";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import * as React from "react";
 import type { ComponentProps } from "react";
-
-import { Icon } from "@calcom/ui/components/icon";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -62,7 +61,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "text-emphasis data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] overflow-hidden rounded-lg border bg-white p-1 shadow-lg",
+        "text-default data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] overflow-hidden rounded-lg border bg-white p-1 shadow-lg",
         className
       )}
       {...props}
@@ -75,22 +74,43 @@ const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
     inset?: boolean;
+    StartIcon?: React.ComponentProps<typeof Icon>["name"];
+    href?: string;
+    color?: "default" | "destructive";
   }
->(({ className, inset, disabled, ...props }, ref) => (
-  <DropdownMenuPrimitive.Item
-    ref={ref}
-    disabled={disabled}
-    className={cn(
-      "relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors",
-      inset && "pl-8",
-      disabled
-        ? "text-emphasis cursor-not-allowed opacity-50 hover:bg-transparent"
-        : "hover:bg-subtle focus:bg-muted focus:text-accent-foreground cursor-pointer",
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, inset, disabled, StartIcon, href, color = "default", children, ...props }, ref) => {
+  const itemClasses = cn(
+    "relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors",
+    inset && "pl-8",
+    disabled
+      ? "text-default cursor-not-allowed opacity-50 hover:bg-transparent"
+      : "hover:bg-subtle focus:bg-muted focus:text-accent-foreground cursor-pointer",
+    color === "destructive" && "text-destructive focus:bg-error hover:bg-error hover:border-semantic-error",
+    className
+  );
+
+  // If href is passed, render as an anchor
+  if (href) {
+    return (
+      <DropdownMenuPrimitive.Item asChild ref={ref} disabled={disabled} {...props}>
+        <a href={href} className={itemClasses}>
+          {StartIcon && <Icon name={StartIcon} className="mr-2 h-4 w-4" />}
+          {children}
+        </a>
+      </DropdownMenuPrimitive.Item>
+    );
+  }
+
+  // Otherwise render as normal item
+  return (
+    <DropdownMenuPrimitive.Item ref={ref} disabled={disabled} className={itemClasses} {...props}>
+      {StartIcon && <Icon name={StartIcon} className="mr-2 h-4 w-4" />}
+      {children}
+    </DropdownMenuPrimitive.Item>
+  );
+});
+
+DropdownMenuItem.displayName = "DropdownMenuItem";
 
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
 

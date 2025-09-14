@@ -1,6 +1,7 @@
+import { workflowSelect } from "@calid/features/modules/workflows/utils/getWorkflows";
+
 import { getBookingFieldsWithSystemFields } from "@calcom/features/bookings/lib/getBookingFields";
 import { bookingResponsesDbSchema } from "@calcom/features/bookings/lib/getBookingResponsesSchema";
-import { workflowSelect } from "@calcom/features/ee/workflows/lib/getAllWorkflows";
 import prisma from "@calcom/prisma";
 import type { Prisma } from "@calcom/prisma/client";
 import { BookingStatus } from "@calcom/prisma/enums";
@@ -17,6 +18,8 @@ export const getEventTypesFromDB = async (id: number) => {
     darkBrandColor: true,
     email: true,
     timeZone: true,
+    bannerUrl: true,
+    faviconUrl: true,
   };
   const eventType = await prisma.eventType.findUnique({
     where: {

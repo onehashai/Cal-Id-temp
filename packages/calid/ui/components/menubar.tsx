@@ -1,8 +1,10 @@
 import { cn } from "@calid/features/lib/cn";
+import { Icon } from "@calid/features/ui/components/icon";
+
+
+
 import * as MenubarPrimitive from "@radix-ui/react-menubar";
 import * as React from "react";
-
-import { Icon } from "@calcom/ui/components/icon";
 
 const MenubarMenu = MenubarPrimitive.Menu;
 

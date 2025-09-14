@@ -1,8 +1,10 @@
 import { cn } from "@calid/features/lib/cn";
+import { Icon } from "@calid/features/ui/components/icon";
+
+
+
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import * as React from "react";
-
-import { Icon } from "@calcom/ui/components/icon";
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
@@ -25,7 +27,7 @@ const RadioGroupItem = React.forwardRef<
       )}
       {...props}>
       <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-        <Icon name="circle" className="h-2.5 w-2.5 fill-current text-current" />
+        <Icon name="circle" className="text-active h-2.5 w-2.5 fill-current" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );

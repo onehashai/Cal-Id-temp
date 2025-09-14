@@ -1,6 +1,11 @@
-import { Icon } from "@calid/features/ui/components/icon/Icon";
+import { Icon } from "@calid/features/ui/components/icon";
 import type { IconName } from "@calid/features/ui/components/icon/Icon";
-import { Tooltip } from "@calid/features/ui/components/tooltip";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipContent,
+  TooltipTrigger,
+} from "@calid/features/ui/components/tooltip";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import type { LinkProps } from "next/link";
@@ -29,7 +34,10 @@ export type ButtonBaseProps = {
   disabled?: boolean;
   flex?: boolean;
 } & Omit<InferredVariantProps, "color"> & {
+    // If a string (e.g. hex/rgb/css var) is provided, it will be used as a custom
+    // color for primary-style buttons (background, border, and readable text color)
     color?: ButtonColor;
+    brandColor?: string;
   };
 
 export type ButtonProps = ButtonBaseProps &
@@ -43,7 +51,7 @@ export const buttonClasses = cva(
   {
     variants: {
       variant: {
-        button: "",
+        button: "border border-border",
         icon: "flex justify-center",
         fab: "min-w-14 min-h-14 md:min-w-min md:min-h-min rounded-md justify-center radix-state-open:rotate-45 md:radix-state-open:rotate-0 radix-state-open:shadown-none radix-state-open:ring-0",
       },
@@ -52,18 +60,39 @@ export const buttonClasses = cva(
           // Base colors
           "bg-cal-active",
           "text-white",
+          // Hover state
+          // Focus state
+          "focus-visible:bg-subtle",
+          "focus-visible:outline-none",
+          "focus-visible:ring-0",
+          "focus-visible:shadow-outline-gray-focused",
+          // Border
+          "border border-active",
           // Disabled
           "disabled:opacity-30",
           // Shadows and effects
-          "enabled:hover:shadow-button-solid-brand-hover",
+          "transition-shadow",
+          "transition-transform",
+          "duration-100",
+        ],
+
+        primary_dim: [
+          // Base colors
+          "bg-cal-active-dim",
+          "text-cal-active",
+          "border:bg-cal-active",
+          // Disabled
+          "disabled:opacity-30",
+          "hover:bg-cal-active/90",
+          "border",
+          "border-active",
+          // Shadows and effects
         ],
 
         secondary: [
           // Base colors and border
           "bg-white",
           "text-default",
-          "border",
-          "border-default",
           // Hover state
           "enabled:hover:bg-muted",
           "enabled:hover:text-emphasis",
@@ -75,7 +104,6 @@ export const buttonClasses = cva(
           "focus-visible:ring-0",
           "focus-visible:shadow-outline-gray-focused",
           // Shadows and effects
-          "shadow-outline-gray-rested",
           "enabled:hover:shadow-outline-gray-hover",
           "enabled:active:shadow-outline-gray-active",
           "transition-shadow",
@@ -85,11 +113,8 @@ export const buttonClasses = cva(
         minimal: [
           // Base color
           "text-subtle",
-          "border border-transparent",
           // Hover
-          "enabled:hover:bg-subtle",
-          "enabled:hover:text-emphasis",
-          "enabled:hover:border-subtle hover:border",
+          "enabled:hover:border-emphasis hover:border",
           // Disabled
           "disabled:opacity-30",
           // Focus
@@ -107,8 +132,7 @@ export const buttonClasses = cva(
 
         destructive: [
           // Base colors
-          "border",
-          "border-default",
+          "text-default",
           // Hover state
           "dark:hover:text-red-600",
           "hover:border-semantic-error",
@@ -134,7 +158,7 @@ export const buttonClasses = cva(
         ],
       },
       size: {
-        xs: "h-6 p-2 leading-none text-xs rounded-md",
+        xs: "h-2 p-2 leading-none text-xs rounded-md",
         sm: "h-7 px-2 py-1.5 leading-none text-sm" /** For backwards compatibility */,
         base: "px-2.5 py-2 text-sm leading-none",
         lg: "px-3 py-2.5 ",
@@ -172,7 +196,7 @@ export const buttonClasses = cva(
       {
         variant: "icon",
         size: "base",
-        className: "min-h-[36px] min-w-[36px] !p-2 hover:border-default",
+        className: "!p-2 hover:border-default",
       },
       {
         variant: "icon",
@@ -220,6 +244,7 @@ export const Button = forwardRef<HTMLAnchorElement | HTMLButtonElement, ButtonPr
     CustomStartIcon,
     EndIcon,
     shallow,
+    brandColor,
     // attributes propagated from `HTMLAnchorProps` or `HTMLButtonProps`
     ...passThroughProps
   } = props;
@@ -235,7 +260,15 @@ export const Button = forwardRef<HTMLAnchorElement | HTMLButtonElement, ButtonPr
       disabled,
       type: !isLink ? type : undefined,
       ref: forwardedRef,
-      className: classNames(buttonClasses({ color, size, loading, variant }), props.className),
+      // className: classNames(buttonClasses({ color, size, loading, variant }), props.className),
+      className: (() => {
+        const classes = classNames(buttonClasses({ color, size, loading, variant }), props.className);
+        return classes;
+      })(),
+      style: {
+        backgroundColor: brandColor,
+        border: brandColor ? "none" : undefined,
+      },
       // if we click a disabled button, we prevent going through the click handler
       onClick: disabled
         ? (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -351,14 +384,19 @@ const Wrapper = ({
   }
 
   return (
-    <Tooltip
-      data-testid="tooltip"
-      className={tooltipClassName}
-      content={tooltip}
-      side={tooltipSide}
-      sideOffset={tooltipOffset}>
-      {children}
-    </Tooltip>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+
+        <TooltipContent
+          side={tooltipSide}
+          sideOffset={tooltipOffset}
+          className={tooltipClassName}
+          data-testid="tooltip">
+          {tooltip}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

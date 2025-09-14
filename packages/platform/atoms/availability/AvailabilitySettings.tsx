@@ -2,7 +2,7 @@
 
 import { cn } from "@calid/features/lib/cn";
 import { Button } from "@calid/features/ui/components/button";
-import { VerticalDivider } from "@calid/features/ui/components/divider";
+import { Icon } from "@calid/features/ui/components/icon";
 import { Switch } from "@calid/features/ui/components/switch";
 import { Tooltip } from "@calid/features/ui/components/tooltip";
 import type { SetStateAction, Dispatch } from "react";
@@ -41,7 +41,6 @@ import { DialogTrigger, ConfirmationDialogContent } from "@calcom/ui/components/
 import { EditableHeading } from "@calcom/ui/components/editable-heading";
 import { Form } from "@calcom/ui/components/form";
 import { Label } from "@calcom/ui/components/form";
-import { Icon } from "@calcom/ui/components/icon";
 import { SkeletonText, SelectSkeletonLoader, Skeleton } from "@calcom/ui/components/skeleton";
 
 import { Shell as PlatformShell } from "../src/components/ui/shell";
@@ -415,7 +414,6 @@ export const AvailabilitySettings = forwardRef<AvailabilitySettingsFormRef, Avai
                       />
                     )}
                   />
-                  <VerticalDivider className="hidden sm:inline" />
                 </>
               ) : null}
             </div>
@@ -583,7 +581,6 @@ export const AvailabilitySettings = forwardRef<AvailabilitySettingsFormRef, Avai
               loading={isSaving}>
               {t("save")}
             </Button>
-            <VerticalDivider className="hidden sm:inline" />
             <Button
               className="ml-3 sm:hidden"
               StartIcon="ellipsis-vertical"

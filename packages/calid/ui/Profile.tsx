@@ -8,12 +8,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@calid/features/ui/components/dropdown-menu";
-import { Icon } from "@calid/features/ui/components/icon/Icon";
+import { Icon } from "@calid/features/ui/components/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import useMeQuery from "@calcom/trpc/react/hooks/useMeQuery";
+import { SUPPORT_MAIL_ADDRESS } from "@calcom/lib/constants";
 
 interface ProfileProps {
   small?: boolean;
@@ -36,7 +37,7 @@ export const Profile = ({ small }: ProfileProps) => {
         window.open("https://docs.cal.id", "_blank");
         break;
       case "contact":
-        window.location.href = "mailto:support@cal.id";
+        window.location.href = SUPPORT_MAIL_ADDRESS
         break;
     }
   };
@@ -52,7 +53,7 @@ export const Profile = ({ small }: ProfileProps) => {
         }
       }}>
       <DropdownMenuTrigger asChild>
-        <button className="hover:bg-subtle flex hidden w-auto items-center space-x-3 rounded-lg p-2 transition-colors md:flex">
+        <button className="hover:bg-emphasis flex hidden w-auto items-center space-x-3 rounded-lg py-1 px-2 transition-colors md:flex">
           <div className="bg-primary flex h-6 w-6 items-center justify-center rounded-full">
             <span className="text-primary-foreground text-xs font-medium">
               <Avatar
@@ -128,9 +129,7 @@ export const Profile = ({ small }: ProfileProps) => {
           <Icon name="settings" className="mr-2 h-4 w-4" />
           {t("settings")}
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => (window.location.href = "/auth/logout")}
-          className="text-destructive hover:border-semantic-error hover:bg-error">
+        <DropdownMenuItem onClick={() => (window.location.href = "/auth/logout")} color="destructive">
           <Icon name="log-out" className=" mr-2 h-4 w-4" />
           {t("sign_out")}
         </DropdownMenuItem>

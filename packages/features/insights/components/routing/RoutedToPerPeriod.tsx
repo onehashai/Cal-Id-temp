@@ -1,5 +1,10 @@
 "use client";
 
+import { Avatar } from "@calid/features/ui/components/avatar";
+import { Badge } from "@calid/features/ui/components/badge";
+import { Button } from "@calid/features/ui/components/button";
+import { ToggleGroup } from "@calid/features/ui/components/toggle-group";
+import { Tooltip } from "@calid/features/ui/components/tooltip";
 import type { TFunction } from "i18next";
 import { useQueryState } from "nuqs";
 import { type ReactNode, useMemo, useRef, useState } from "react";
@@ -10,10 +15,7 @@ import { useInViewObserver } from "@calcom/lib/hooks/useInViewObserver";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { trpc } from "@calcom/trpc";
 import classNames from "@calcom/ui/classNames";
-import { Avatar } from "@calcom/ui/components/avatar";
-import { Badge } from "@calcom/ui/components/badge";
-import { Button } from "@calcom/ui/components/button";
-import { ToggleGroup, Input } from "@calcom/ui/components/form";
+import { Input } from "@calcom/ui/components/form";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@calcom/ui/components/hover-card";
 import {
   TableNew,
@@ -23,7 +25,6 @@ import {
   TableHeader,
   TableRow,
 } from "@calcom/ui/components/table";
-import { Tooltip } from "@calcom/ui/components/tooltip";
 
 import { useInsightsParameters } from "../../hooks/useInsightsParameters";
 import { ChartCard } from "../ChartCard";
@@ -84,6 +85,7 @@ function DownloadButton({
     <Button
       type="button" // Change from submit to button
       color="secondary"
+      className="border-default"
       variant="icon"
       onClick={handleDownload}
       disabled={isDownloading}
@@ -143,7 +145,7 @@ function FormCard({
                   placeholder={t("search")}
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
-                  className="w-full"
+                  className="h-full w-full"
                 />
               </div>
               <DownloadButton

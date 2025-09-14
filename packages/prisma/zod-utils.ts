@@ -125,6 +125,12 @@ const _eventTypeMetaDataSchemaWithoutApps = z.object({
     })
     .optional(),
   bookerLayouts: bookerLayouts.optional(),
+  iconParams: z
+    .object({
+      icon: z.string(), // <name_of_icon_from_lucide_library>
+      color: z.string().regex(/^#([0-9A-Fa-f]{6})$/, "Invalid hex color"), // validates hex
+    })
+    .optional(),
 });
 
 export const eventTypeMetaDataSchemaWithUntypedApps = _eventTypeMetaDataSchemaWithoutApps.merge(
@@ -297,6 +303,7 @@ export const bookingCancelSchema = z.object({
     })
     .optional()
     .nullable(),
+  autoRefund: z.boolean(),
 });
 
 export const bookingCancelAttendeeSeatSchema = z.object({
@@ -325,12 +332,14 @@ export const createdEventSchema = z
   .passthrough();
 
 const schemaDefaultConferencingApp = z.object({
-  appSlug: z.string().default("daily-video").optional(),
+  appSlug: z.string().default("jitsi").optional(),
   appLink: z.string().optional(),
 });
 
 export const userMetadata = z
   .object({
+    headerUrl: z.string().nullable().optional(),
+    phoneNumber: z.string().nullable().optional(),
     proPaidForByTeamId: z.number().optional(),
     stripeCustomerId: z.string().optional(),
     vitalSettings: vitalSettingsUpdateSchema.optional(),
@@ -350,6 +359,7 @@ export const userMetadata = z
         revertTime: z.string().optional(),
       })
       .optional(),
+    currentOnboardingStep: z.string().optional(),
   })
   .nullable();
 
@@ -396,6 +406,7 @@ export const teamMetadataSchema = z
 export const bookingMetadataSchema = z
   .object({
     videoCallUrl: z.string().optional(),
+    meetingNote: z.string().optional(),
   })
   .and(z.record(z.string()))
   .nullable()

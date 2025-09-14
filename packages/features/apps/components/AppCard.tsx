@@ -55,18 +55,17 @@ export function AppCard({ app, credentials, searchText, userAdminTeams }: AppCar
     setSearchTextIndex(searchText ? app.name.toLowerCase().indexOf(searchText.toLowerCase()) : undefined);
   }, [app.name, searchText]);
 
-  const handleAppInstall = () => {
+  const handleAppInstall = async () => {
     if (isConferencing(app.categories)) {
+      const onBoardingUrl = await getAppOnboardingUrl({
+        slug: app.slug,
+        step: AppOnboardingSteps.EVENT_TYPES_STEP,
+      });
       mutation.mutate({
         type: app.type,
         variant: app.variant,
         slug: app.slug,
-        returnTo:
-          WEBAPP_URL +
-          getAppOnboardingUrl({
-            slug: app.slug,
-            step: AppOnboardingSteps.EVENT_TYPES_STEP,
-          }),
+        returnTo: WEBAPP_URL + onBoardingUrl,
       });
     } else if (
       !doesAppSupportTeamInstall({
@@ -77,7 +76,12 @@ export function AppCard({ app, credentials, searchText, userAdminTeams }: AppCar
     ) {
       mutation.mutate({ type: app.type });
     } else {
-      router.push(getAppOnboardingUrl({ slug: app.slug, step: AppOnboardingSteps.ACCOUNTS_STEP }));
+      const onBoardingUrl = await getAppOnboardingUrl({
+        slug: app.slug,
+        step: AppOnboardingSteps.ACCOUNTS_STEP,
+      });
+
+      router.push(onBoardingUrl);
     }
   };
 
@@ -131,49 +135,55 @@ export function AppCard({ app, credentials, searchText, userAdminTeams }: AppCar
           data-testid={`app-store-app-card-${app.slug}`}>
           {t("details")}
         </Button>
-        {app.isGlobal || (credentials && credentials.length > 0 && allowedMultipleInstalls)
-          ? !app.isGlobal && (
-              <InstallAppButton
-                type={app.type}
-                teamsPlanRequired={app.teamsPlanRequired}
-                disableInstall={!!app.dependencies && !app.dependencyData?.some((data) => !data.installed)}
-                wrapperClassName="[@media(max-width:260px)]:w-full"
-                render={({ useDefaultComponent, ...props }) => {
-                  if (useDefaultComponent) {
-                    props = {
-                      ...props,
-                      onClick: () => {
-                        handleAppInstall();
-                      },
-                      loading: mutation.isPending,
-                    };
-                  }
-                  return <InstallAppButtonChild paid={app.paid} {...props} />;
-                }}
-              />
-            )
-          : credentials &&
-            !appInstalled && (
-              <InstallAppButton
-                type={app.type}
-                wrapperClassName="[@media(max-width:260px)]:w-full"
-                disableInstall={!!app.dependencies && app.dependencyData?.some((data) => !data.installed)}
-                teamsPlanRequired={app.teamsPlanRequired}
-                render={({ useDefaultComponent, ...props }) => {
-                  if (useDefaultComponent) {
-                    props = {
-                      ...props,
-                      disabled: !!props.disabled,
-                      onClick: () => {
-                        handleAppInstall();
-                      },
-                      loading: mutation.isPending,
-                    };
-                  }
-                  return <InstallAppButtonChild paid={app.paid} {...props} />;
-                }}
-              />
-            )}
+        {app.slug !== "onehash-chat" && (
+          <>
+            {app.isGlobal || (credentials && credentials.length > 0 && allowedMultipleInstalls)
+              ? !app.isGlobal && (
+                  <InstallAppButton
+                    type={app.type}
+                    teamsPlanRequired={app.teamsPlanRequired}
+                    disableInstall={
+                      !!app.dependencies && !app.dependencyData?.some((data) => !data.installed)
+                    }
+                    wrapperClassName="[@media(max-width:260px)]:w-full"
+                    render={({ useDefaultComponent, ...props }) => {
+                      if (useDefaultComponent) {
+                        props = {
+                          ...props,
+                          onClick: async () => {
+                            await handleAppInstall();
+                          },
+                          loading: mutation.isPending,
+                        };
+                      }
+                      return <InstallAppButtonChild paid={app.paid} {...props} />;
+                    }}
+                  />
+                )
+              : credentials &&
+                !appInstalled && (
+                  <InstallAppButton
+                    type={app.type}
+                    wrapperClassName="[@media(max-width:260px)]:w-full"
+                    disableInstall={!!app.dependencies && app.dependencyData?.some((data) => !data.installed)}
+                    teamsPlanRequired={app.teamsPlanRequired}
+                    render={({ useDefaultComponent, ...props }) => {
+                      if (useDefaultComponent) {
+                        props = {
+                          ...props,
+                          disabled: !!props.disabled,
+                          onClick: async () => {
+                            await handleAppInstall();
+                          },
+                          loading: mutation.isPending,
+                        };
+                      }
+                      return <InstallAppButtonChild paid={app.paid} {...props} />;
+                    }}
+                  />
+                )}
+          </>
+        )}
       </div>
       <div className="absolute right-0 mr-4 flex max-w-44 flex-wrap justify-end gap-1">
         {appAdded > 0 ? <Badge variant="success">{t("installed", { count: appAdded })}</Badge> : null}

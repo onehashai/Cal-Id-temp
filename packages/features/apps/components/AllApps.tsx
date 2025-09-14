@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon } from "@calid/features/ui/components/icon/Icon";
+import { Icon } from "@calid/features/ui/components/icon";
 import type { HorizontalTabItemProps } from "@calid/features/ui/components/navigation";
 import { HorizontalTabs } from "@calid/features/ui/components/navigation";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -173,6 +173,7 @@ export function AllApps({ apps, categories, userAdminTeams }: AllAppsPropsType) 
         : true
     )
     .filter((app) => (searchText ? app.name.toLowerCase().includes(searchText.toLowerCase()) : true))
+    .filter((app) => app.slug !== "daily-video")
     .sort(function (a, b) {
       if (a.name < b.name) return -1;
       else if (a.name > b.name) return 1;

@@ -1,52 +1,56 @@
 "use client";
 
+import { Icon } from "@calid/features/ui/components/icon";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
-import LicenseRequired from "@calcom/features/ee/common/components/LicenseRequired";
 import SkeletonLoaderTeamList from "@calcom/features/ee/teams/components/SkeletonloaderTeamList";
-import { CreateButtonWithTeamsList } from "@calcom/features/ee/teams/components/createButton/CreateButtonWithTeamsList";
 import { FilterResults } from "@calcom/features/filters/components/FilterResults";
 import { TeamsFilter } from "@calcom/features/filters/components/TeamsFilter";
 import { getTeamsFiltersFromQuery } from "@calcom/features/filters/lib/getTeamsFiltersFromQuery";
 import { ShellMain } from "@calcom/features/shell/Shell";
-import { UpgradeTip } from "@calcom/features/tips";
-import { WEBAPP_URL } from "@calcom/lib/constants";
-import { useHasPaidPlan } from "@calcom/lib/hooks/useHasPaidPlan";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useRouterQuery } from "@calcom/lib/hooks/useRouterQuery";
 import { trpc } from "@calcom/trpc/react";
 import { ArrowButton } from "@calcom/ui/components/arrow-button";
 import { Badge } from "@calcom/ui/components/badge";
-import { Button } from "@calcom/ui/components/button";
-import { ButtonGroup } from "@calcom/ui/components/buttonGroup";
 import { EmptyScreen } from "@calcom/ui/components/empty-screen";
-import { Icon } from "@calcom/ui/components/icon";
-import { List, ListLinkItem } from "@calcom/ui/components/list";
+import { List } from "@calcom/ui/components/list";
+import { ListItemAdvanced } from "@calcom/ui/components/list";
 import { Tooltip } from "@calcom/ui/components/tooltip";
 
-import type { SetNewFormDialogState, NewFormDialogState } from "../../components/FormActions";
-import { FormAction, FormActionsDropdown, FormActionsProvider } from "../../components/FormActions";
+import type { NewFormDialogState } from "../../components/FormActions";
+import type { SelectTeamDialogState, SetSelectTeamDialogState } from "../../components/FormActions";
+import {
+  FormAction,
+  FormActionsDropdown,
+  FormLinkDisplay,
+  FormActionsProvider,
+} from "../../components/FormActions";
 import { isFallbackRoute } from "../../lib/isFallbackRoute";
 import type { RoutingFormWithResponseCount } from "../../types/types";
 
-function NewFormButton({ setNewFormDialogState }: { setNewFormDialogState: SetNewFormDialogState }) {
+function NewFormButton({ setSelectTeamDialogState }: { setSelectTeamDialogState: SetSelectTeamDialogState }) {
   const { t } = useLocale();
   return (
-    <CreateButtonWithTeamsList
-      subtitle={t("create_routing_form_on").toUpperCase()}
-      data-testid="new-routing-form"
-      createFunction={(teamId) => {
-        setNewFormDialogState({ action: "new", target: teamId ? String(teamId) : "" });
-      }}
-    />
+    <Button onClick={() => setSelectTeamDialogState({ target: null })}>
+      <Icon name="plus" className="h-4 w-4" />
+      <span>{t("new")}</span>
+    </Button>
+
+    // <CreateButtonWithTeamsList
+    //   subtitle={t("create_routing_form_on").toUpperCase()}
+    //   data-testid="new-routing-form"
+    //   createFunction={(teamId) => {
+    //     setNewFormDialogState({ action: "new", target: teamId ? String(teamId) : "" });
+    //   }}
+    // />
   );
 }
 
 export default function RoutingForms({ appUrl }: { appUrl: string }) {
   const { t } = useLocale();
-  const { hasPaidPlan } = useHasPaidPlan();
   const routerQuery = useRouterQuery();
   const hookForm = useFormContext<RoutingFormWithResponseCount>();
   const utils = trpc.useUtils();
@@ -74,6 +78,8 @@ export default function RoutingForms({ appUrl }: { appUrl: string }) {
   });
 
   const [newFormDialogState, setNewFormDialogState] = useState<NewFormDialogState>(null);
+
+  const [selectTeamDialogState, setSelectTeamDialogState] = useState<SelectTeamDialogState>(null);
 
   const forms = queryRes.data?.filtered;
   const features = [
@@ -133,195 +139,195 @@ export default function RoutingForms({ appUrl }: { appUrl: string }) {
   }
 
   return (
-    <LicenseRequired>
-      <ShellMain
-        heading={t("routing")}
-        CTA={
-          hasPaidPlan && forms?.length ? (
-            <NewFormButton setNewFormDialogState={setNewFormDialogState} />
-          ) : null
-        }
-        subtitle={t("routing_forms_description")}>
-        <UpgradeTip
-          plan="team"
-          title={t("teams_plan_required")}
-          description={t("routing_forms_are_a_great_way")}
-          features={features}
-          background="/tips/routing-forms"
-          isParentLoading={<SkeletonLoaderTeamList />}
-          buttons={
-            <div className="space-y-2 rtl:space-x-reverse sm:space-x-2">
-              <ButtonGroup>
-                <Button color="primary" href={`${WEBAPP_URL}/settings/teams/new`}>
-                  {t("upgrade")}
-                </Button>
-                <Button color="minimal" href="https://go.cal.com/teams-video" target="_blank">
-                  {t("learn_more")}
-                </Button>
-              </ButtonGroup>
-            </div>
-          }>
-          <FormActionsProvider
-            appUrl={appUrl}
-            newFormDialogState={newFormDialogState}
-            setNewFormDialogState={setNewFormDialogState}>
-            <div className="mb-10 w-full">
-              <div className="mb-2 flex">
-                <TeamsFilter />
-              </div>
-              <FilterResults
-                queryRes={queryRes}
-                emptyScreen={
-                  <EmptyScreen
-                    Icon="git-merge"
-                    headline={t("create_your_first_form")}
-                    description={t("create_your_first_form_description")}
-                    buttonRaw={<NewFormButton setNewFormDialogState={setNewFormDialogState} />}
+    // <LicenseRequired>
+    <ShellMain
+      heading={t("routing")}
+      // CTA={
+      // }
+      subtitle={t("routing_forms_description")}>
+      {/* <UpgradeTip
+        plan="team"
+        title={t("teams_plan_required")}
+        description={t("routing_forms_are_a_great_way")}
+        features={features}
+        background="/tips/routing-forms"
+        isParentLoading={<SkeletonLoaderTeamList />}
+        buttons={
+          <div className="space-y-2 sm:space-x-2 rtl:space-x-reverse">
+            <ButtonGroup>
+              <Button color="primary" href={`${WEBAPP_URL}/settings/teams/new`}>
+                {t("upgrade")}
+              </Button>
+              <Button color="minimal" href="https://go.cal.com/teams-video" target="_blank">
+                {t("learn_more")}
+              </Button>
+            </ButtonGroup>
+          </div>
+        }> */}
+      <FormActionsProvider
+        appUrl={appUrl}
+        newFormDialogState={newFormDialogState}
+        setNewFormDialogState={setNewFormDialogState}
+        selectTeamDialogState={selectTeamDialogState}
+        setSelectTeamDialogState={setSelectTeamDialogState}>
+        <div className="mb-10 w-full">
+          <div className="mb-2 flex flex-row justify-between">
+            <TeamsFilter />
+            {forms?.length && <NewFormButton setSelectTeamDialogState={setSelectTeamDialogState} />}
+          </div>
+          <FilterResults
+            queryRes={queryRes}
+            emptyScreen={
+              <EmptyScreen
+                Icon="git-merge"
+                headline={t("create_your_first_form")}
+                description={t("create_your_first_form_description")}
+                buttonRaw={
+                  <NewFormButton
+                    setSelectTeamDialogState={(team) => {
+                      console.log("Toggling dialog: ", selectTeamDialogState);
+                      setSelectTeamDialogState(team);
+                    }}
                   />
                 }
-                noResultsScreen={
-                  <EmptyScreen
-                    Icon="git-merge"
-                    headline={t("no_results_for_filter")}
-                    description={t("change_filter_common")}
-                  />
-                }
-                SkeletonLoader={SkeletonLoaderTeamList}>
-                <div className="bg-default mb-16 overflow-hidden">
-                  <List data-testid="routing-forms-list" ref={parent}>
-                    {forms?.map(({ form, readOnly, hasError }, index) => {
-                      // Make the form read only if it has an error
-                      // TODO: Consider showing error in UI so user can report and get it fixed.
-                      readOnly = readOnly || hasError;
-                      if (!form) {
-                        return null;
-                      }
+              />
+            }
+            noResultsScreen={
+              <EmptyScreen
+                Icon="git-merge"
+                headline={t("no_results_for_filter")}
+                description={t("change_filter_common")}
+              />
+            }
+            SkeletonLoader={SkeletonLoaderTeamList}>
+            <div className="bg-default mb-16 overflow-hidden">
+              <List noBorderTreatment roundContainer data-testid="routing-forms-list" ref={parent}>
+                {forms?.map(({ form, readOnly, hasError }, index) => {
+                  // Make the form read only if it has an error
+                  // TODO: Consider showing error in UI so user can report and get it fixed.
+                  readOnly = readOnly || hasError;
+                  if (!form) {
+                    return null;
+                  }
 
-                      const description = form.description || "";
-                      form.routes = form.routes || [];
-                      const fields = form.fields || [];
-                      const userRoutes = form.routes.filter((route) => !isFallbackRoute(route));
-                      const firstItem = forms[0].form;
-                      const lastItem = forms[forms.length - 1].form;
+                  const description = form.description || "";
+                  form.routes = form.routes || [];
+                  const fields = form.fields || [];
+                  const userRoutes = form.routes.filter((route) => !isFallbackRoute(route));
+                  const firstItem = forms[0].form;
+                  const lastItem = forms[forms.length - 1].form;
 
-                      return (
-                        <div
-                          className="group flex w-full max-w-full items-center justify-between overflow-hidden"
-                          key={form.id}>
-                          {!(firstItem && firstItem.id === form.id) && (
-                            <ArrowButton onClick={() => moveRoutingForm(index, -1)} arrowDirection="up" />
-                          )}
+                  return (
+                    <div
+                      className="border-subtle group my-2 flex w-full max-w-full items-center justify-between gap-4 overflow-hidden rounded border"
+                      key={form.id}>
+                      {!(firstItem && firstItem.id === form.id) && (
+                        <ArrowButton onClick={() => moveRoutingForm(index, -1)} arrowDirection="up" />
+                      )}
 
-                          {!(lastItem && lastItem.id === form.id) && (
-                            <ArrowButton onClick={() => moveRoutingForm(index, 1)} arrowDirection="down" />
-                          )}
-                          <ListLinkItem
-                            href={`${appUrl}/form-edit/${form.id}`}
-                            heading={form.name}
-                            disabled={readOnly}
-                            subHeading={description}
-                            className="space-x-2 rtl:space-x-reverse"
-                            actions={
-                              <>
-                                {form.team?.name && (
-                                  <div className="border-subtle border-r-2">
-                                    <Badge className="ltr:mr-2 rtl:ml-2" variant="gray">
-                                      {form.team.name}
-                                    </Badge>
-                                  </div>
-                                )}
+                      {!(lastItem && lastItem.id === form.id) && (
+                        <ArrowButton onClick={() => moveRoutingForm(index, 1)} arrowDirection="down" />
+                      )}
+                      <ListItemAdvanced
+                        // href={`${appUrl}/form-edit/${form.id}`}
+                        heading={form.name}
+                        headingTrailingItem={
+                          <div className="flex w-full flex-row items-center justify-between">
+                            <div className="bg-muted py-.5 flex h-6 flex-row items-center space-x-1 rounded px-2 rtl:space-x-reverse">
+                              <FormLinkDisplay routingFormId={form.id} />
+                              <Tooltip content={t("copy_link_to_form")}>
                                 <FormAction
-                                  disabled={readOnly}
-                                  className="self-center"
-                                  action="toggle"
                                   routingForm={form}
-                                />
-                                <ButtonGroup combined>
-                                  <Tooltip content={t("preview")}>
-                                    <FormAction
-                                      action="preview"
-                                      routingForm={form}
-                                      target="_blank"
-                                      StartIcon="external-link"
-                                      color="secondary"
-                                      variant="icon"
-                                    />
-                                  </Tooltip>
-                                  <FormAction
-                                    routingForm={form}
-                                    action="copyLink"
-                                    color="secondary"
-                                    variant="icon"
-                                    StartIcon="link"
-                                    tooltip={t("copy_link_to_form")}
-                                  />
-                                  <FormAction
-                                    routingForm={form}
-                                    action="embed"
-                                    color="secondary"
-                                    variant="icon"
-                                    StartIcon="code"
-                                    tooltip={t("embed")}
-                                  />
-                                  <FormActionsDropdown disabled={readOnly}>
-                                    <FormAction
-                                      action="edit"
-                                      routingForm={form}
-                                      color="minimal"
-                                      className="!flex"
-                                      StartIcon="pencil">
-                                      {t("edit")}
-                                    </FormAction>
-                                    <FormAction
-                                      action="download"
-                                      routingForm={form}
-                                      color="minimal"
-                                      StartIcon="download">
-                                      {t("download_responses")}
-                                    </FormAction>
-                                    <FormAction
-                                      action="duplicate"
-                                      routingForm={form}
-                                      color="minimal"
-                                      className="w-full"
-                                      StartIcon="copy">
-                                      {t("duplicate")}
-                                    </FormAction>
-                                    <FormAction
-                                      action="_delete"
-                                      routingForm={form}
-                                      color="destructive"
-                                      className="w-full"
-                                      StartIcon="trash">
-                                      {t("delete")}
-                                    </FormAction>
-                                  </FormActionsDropdown>
-                                </ButtonGroup>
-                              </>
-                            }>
-                            <div className="flex flex-wrap gap-1">
-                              <Badge variant="gray" startIcon="menu">
-                                {fields.length} {fields.length === 1 ? "field" : "fields"}
-                              </Badge>
-                              <Badge variant="gray" startIcon="git-merge">
-                                {userRoutes.length} {userRoutes.length === 1 ? "route" : "routes"}
-                              </Badge>
-                              <Badge variant="gray" startIcon="message-circle">
-                                {form._count.responses}{" "}
-                                {form._count.responses === 1 ? "response" : "responses"}
-                              </Badge>
+                                  action="copyLink"
+                                  color="secondary"
+                                  variant="icon"
+                                  size="xs">
+                                  <Icon name="link" className="h-3 w-3" />
+                                </FormAction>
+                              </Tooltip>
+                              <Tooltip content={t("preview")}>
+                                <FormAction
+                                  action="preview"
+                                  routingForm={form}
+                                  target="_blank"
+                                  color="secondary"
+                                  variant="icon"
+                                  size="xs">
+                                  <Icon name="external-link" className="h-3 w-3" />
+                                </FormAction>
+                              </Tooltip>
+                              <FormAction
+                                routingForm={form}
+                                action="embed"
+                                color="secondary"
+                                variant="icon"
+                                size="xs">
+                                <Icon name="code" className="h-3 w-3" />
+                              </FormAction>
                             </div>
-                          </ListLinkItem>
+
+                            <div class="flex-1" />
+                            {form.team?.name && (
+                              <div className="border-subtle mr-2 border-r-2">
+                                <Badge className="ltr:mr-2 rtl:ml-2" variant="gray">
+                                  {form.team.name}
+                                </Badge>
+                              </div>
+                            )}
+
+                            <FormAction
+                              disabled={readOnly}
+                              className="mr-2"
+                              action="toggle"
+                              size="xs"
+                              routingForm={form}
+                            />
+
+                            <FormActionsDropdown disabled={readOnly} className="ml-2">
+                              <FormAction action="edit" routingForm={form} className="!flex">
+                                {t("edit")}
+                              </FormAction>
+                              <FormAction action="download" routingForm={form}>
+                                {t("download_responses")}
+                              </FormAction>
+                              <FormAction action="duplicate" routingForm={form} className="w-full">
+                                {t("duplicate")}
+                              </FormAction>
+                              <FormAction
+                                action="_delete"
+                                routingForm={form}
+                                className="text-cal-destructive w-full ">
+                                {t("delete")}
+                              </FormAction>
+                            </FormActionsDropdown>
+                          </div>
+                        }
+                        disabled={readOnly}
+                        subHeading={description}
+                        className="space-x-2 rtl:space-x-reverse"
+                        actions={<></>}>
+                        <div className="flex flex-wrap gap-1">
+                          <Badge variant="gray" startIcon="menu">
+                            {fields.length} {fields.length === 1 ? "field" : "fields"}
+                          </Badge>
+                          <Badge variant="gray" startIcon="git-merge">
+                            {userRoutes.length} {userRoutes.length === 1 ? "route" : "routes"}
+                          </Badge>
+                          <Badge variant="gray" startIcon="message-circle">
+                            {form._count.responses} {form._count.responses === 1 ? "response" : "responses"}
+                          </Badge>
                         </div>
-                      );
-                    })}
-                  </List>
-                </div>
-              </FilterResults>
+                      </ListItemAdvanced>
+                    </div>
+                  );
+                })}
+              </List>
             </div>
-          </FormActionsProvider>
-        </UpgradeTip>
-      </ShellMain>
-    </LicenseRequired>
+          </FilterResults>
+        </div>
+      </FormActionsProvider>
+      {/* </UpgradeTip> */}
+    </ShellMain>
+    // </LicenseRequired>
   );
 }

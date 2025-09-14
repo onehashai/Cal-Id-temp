@@ -1,6 +1,6 @@
 import type { Prisma, SelectedCalendar } from "@prisma/client";
 
-import { DailyLocationType } from "@calcom/app-store/locations";
+import { DailyLocationType, JitsiLocationType } from "@calcom/app-store/locations";
 import slugify from "@calcom/lib/slugify";
 import { PeriodType, SchedulingType } from "@calcom/prisma/enums";
 import type { userSelect } from "@calcom/prisma/selects";
@@ -71,7 +71,7 @@ const commons = {
   periodDays: null,
   slotInterval: null,
   offsetStart: 0,
-  locations: [{ type: DailyLocationType }],
+  locations: [{ type: JitsiLocationType }],
   customInputs,
   disableGuests: true,
   minimumBookingNotice: 120,
@@ -85,7 +85,7 @@ const commons = {
   price: 0,
   currency: "usd",
   schedulingType: SchedulingType.COLLECTIVE,
-  seatsPerTimeSlot: null,
+  seatsPerTimeSlot: undefined,
   seatsShowAttendees: null,
   seatsShowAvailabilityCount: null,
   disableCancelling: false,
@@ -157,6 +157,7 @@ export const dynamicEvent = {
   position: 0,
   ...commons,
   metadata: eventTypeMetaDataSchemaWithTypedApps.parse({ multipleDuration: [15, 30, 45, 60, 90] }),
+  disableGuests: false,
 };
 
 export const defaultEvents = [dynamicEvent];

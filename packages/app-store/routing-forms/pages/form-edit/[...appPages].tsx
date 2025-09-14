@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@calid/features/ui/components/icon";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import type { UseFormReturn } from "react-hook-form";
 import { Controller, useFieldArray, useWatch } from "react-hook-form";
@@ -10,14 +11,7 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import classNames from "@calcom/ui/classNames";
 import { Button } from "@calcom/ui/components/button";
 import { FormCard } from "@calcom/ui/components/card";
-import {
-  BooleanToggleGroupField,
-  Label,
-  SelectField,
-  TextField,
-  MultiOptionInput,
-} from "@calcom/ui/components/form";
-import { Icon } from "@calcom/ui/components/icon";
+import { BooleanToggleGroupField, Label, SelectField, MultiOptionInput } from "@calcom/ui/components/form";
 import { Tooltip } from "@calcom/ui/components/tooltip";
 
 import type { inferSSRProps } from "@lib/types/inferSSRProps";
@@ -90,7 +84,7 @@ function Field({
           router ? { text: router.name, variant: "gray", href: `${appUrl}/form-edit/${router.id}` } : null
         }
         deleteField={router ? null : deleteField}>
-        <div className="bg-default border-default w-full gap-3 rounded-2xl border p-3">
+        <div className="bg-default w-full gap-3 rounded-2xl p-3">
           <div className="mb-3 w-full">
             <TextField
               data-testid={`${hookFieldNamespace}.label`}

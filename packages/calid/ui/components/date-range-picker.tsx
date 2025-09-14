@@ -1,9 +1,11 @@
 import { cn } from "@calid/features/lib/cn";
+import { Icon } from "@calid/features/ui/components/icon";
+
+
+
 import { addDays, format } from "date-fns";
 import * as React from "react";
 import type { DateRange } from "react-day-picker";
-
-import { Icon } from "@calcom/ui/components/icon";
 
 import { Button } from "./button";
 import { Calendar } from "./calendar";
@@ -15,7 +17,7 @@ interface DatePickerWithRangeProps {
   onChange?: (range: DateRange | undefined) => void;
 }
 
-export function DatePickerWithRange({ className, value, onChange }: DatePickerWithRangeProps) {
+function DateRangePicker({ className, value, onChange }: DatePickerWithRangeProps) {
   const [date, setDate] = React.useState<DateRange | undefined>(
     value || {
       from: new Date(2022, 0, 20),
@@ -34,7 +36,7 @@ export function DatePickerWithRange({ className, value, onChange }: DatePickerWi
         <PopoverTrigger asChild>
           <Button
             id="date"
-            variant="outline"
+            color="secondary"
             className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}>
             <Icon name="calendar" className="mr-2 h-4 w-4" />
             {date?.from ? (
@@ -57,10 +59,12 @@ export function DatePickerWithRange({ className, value, onChange }: DatePickerWi
             defaultMonth={date?.from}
             selected={date}
             onSelect={handleDateChange}
-            numberOfMonths={2}
+            numberOfMonths={1}
           />
         </PopoverContent>
       </Popover>
     </div>
   );
 }
+
+export { DateRangePicker };
