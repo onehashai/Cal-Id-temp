@@ -28,6 +28,7 @@ export async function rollbackMigration(ctx: MigrationContext) {
     "selectedCalendar",
     "credential",
     "availability",
+    "avatars",
     "schedule",
     "profile",
     "calIdMembership",

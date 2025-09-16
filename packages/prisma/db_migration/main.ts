@@ -57,7 +57,7 @@ async function runMigration() {
     await runPhase1(ctx); // Core entities
     await runPhase2(ctx); // Auth & Session
     await runPhase3(ctx); // Teams & Organizations
-    await runPhase4(ctx); // Memberships & Profiles
+    await runPhase4(ctx); // Memberships & Profiles & Avatars
 
     await runPhase5(ctx); // Schedules & Availability
     await runPhase6(ctx); // Credentials & Calendars

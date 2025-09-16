@@ -100,8 +100,66 @@ export async function migrateProfiles(ctx: MigrationContext) {
   ctx.log(`Migrated ${oldProfiles.length} profiles`);
 }
 
+export async function migrateAvatars(ctx: MigrationContext) {
+  ctx.log("Migrating Avatars...");
+
+  const oldAvatars = await ctx.oldDb.avatar.findMany();
+
+  await ctx.processBatch(oldAvatars, async (batch) => {
+    const newAvatars = await Promise.all(
+      batch.map(async (oldAvatar: any) => {
+        try {
+          const teamId =
+            oldAvatar.teamId && oldAvatar.teamId !== 0
+              ? ctx.idMappings.calIdTeams[oldAvatar.teamId.toString()]
+              : 0;
+
+          const userId =
+            oldAvatar.userId && oldAvatar.userId !== 0
+              ? ctx.idMappings.users[oldAvatar.userId.toString()]
+              : 0;
+
+          // If neither teamId nor userId resolved, skip
+          if (!teamId && !userId) {
+            ctx.log(`Skipping avatar ${oldAvatar.id} - no mapped team or user`);
+            return null;
+          }
+
+          const newAvatar = await ctx.newDb.avatar.create({
+            data: {
+              teamId: teamId ?? 0,
+              userId: userId ?? 0,
+              data: oldAvatar.data,
+              objectKey: oldAvatar.objectKey,
+              isHeader: oldAvatar.isHeader ?? false,
+              isBanner: oldAvatar.isBanner ?? false,
+            },
+          });
+
+          ctx.idMappings.avatars[oldAvatar.id.toString()] = {
+            teamId: newAvatar.teamId,
+            userId: newAvatar.userId,
+            isHeader: newAvatar.isHeader,
+            isBanner: newAvatar.isBanner,
+          };
+
+          return newAvatar;
+        } catch (error) {
+          ctx.logError(`Failed to migrate avatar ${oldAvatar.id}`, error);
+          return null;
+        }
+      })
+    );
+
+    return newAvatars.filter(Boolean);
+  });
+
+  ctx.log(`Migrated ${oldAvatars.length} avatars`);
+}
+
 export async function runPhase4(ctx: MigrationContext) {
   ctx.log("=== PHASE 4: Memberships and Profiles ===");
   await migrateCalIdMemberships(ctx);
   await migrateProfiles(ctx);
+  await migrateAvatars(ctx);
 }
