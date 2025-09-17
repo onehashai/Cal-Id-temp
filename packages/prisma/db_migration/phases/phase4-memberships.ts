@@ -136,12 +136,12 @@ export async function migrateAvatars(ctx: MigrationContext) {
             },
           });
 
-          ctx.idMappings.avatars[oldAvatar.id.toString()] = {
-            teamId: newAvatar.teamId,
-            userId: newAvatar.userId,
-            isHeader: newAvatar.isHeader,
-            isBanner: newAvatar.isBanner,
-          };
+          // ctx.idMappings.avatars[oldAvatar.id.toString()] = {
+          //   teamId: newAvatar.teamId,
+          //   userId: newAvatar.userId,
+          //   isHeader: newAvatar.isHeader,
+          //   isBanner: newAvatar.isBanner,
+          // };
 
           return newAvatar;
         } catch (error) {

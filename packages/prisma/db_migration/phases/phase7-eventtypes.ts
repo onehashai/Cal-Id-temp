@@ -3,13 +3,18 @@ import type { MigrationContext } from "../types";
 export async function migrateEventTypes(ctx: MigrationContext) {
   ctx.log("Migrating EventTypes...");
 
-  const oldEventTypes = await ctx.oldDb.eventType.findMany();
+  const oldEventTypes = await ctx.oldDb.eventType.findMany({ include: { users: true } });
 
   await ctx.processBatch(oldEventTypes, async (batch) => {
     const newEventTypes = await Promise.all(
       batch.map(async (oldEventType: any) => {
         try {
           const userId = oldEventType.userId ? ctx.idMappings.users[oldEventType.userId.toString()] : null;
+
+          const usersIds = oldEventType.users
+            .map((user: { id: number }) => ctx.idMappings.users[user.id.toString()])
+            .filter((id: string | undefined) => id !== undefined);
+
           const profileId = oldEventType.profileId
             ? ctx.idMappings.profiles[oldEventType.profileId.toString()]
             : null;
@@ -99,6 +104,12 @@ export async function migrateEventTypes(ctx: MigrationContext) {
               parentId: oldEventType.parentId,
               useEventLevelSelectedCalendars: false,
               captchaType: oldEventType.captchaType,
+              users:
+                usersIds.length > 0
+                  ? {
+                      connect: usersIds.map((id: string) => ({ id })),
+                    }
+                  : undefined,
             },
           });
 
